@@ -20,6 +20,13 @@ public class AuditLog {
 
     private boolean deleted = false;
 
+    @PrePersist
+    void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
+
     public Long getId() { return id; }
 
     public String getAction() { return action; }

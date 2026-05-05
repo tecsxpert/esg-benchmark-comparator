@@ -23,7 +23,7 @@ public class AuditLogController {
     // Normal GET
     @GetMapping
     public List<AuditLog> getAllLogs() {
-        return repository.findAll();
+        return repository.findByDeletedFalse();
     }
 
     // Pagination GET

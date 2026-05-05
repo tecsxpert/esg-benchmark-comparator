@@ -1,15 +1,16 @@
-import { Routes, Route } from "react-router-dom";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import App from "./App.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
+import "./index.css";
 
-function Login() {
-  return <h2>Login Page</h2>;
-}
-
-function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Login />} />
-    </Routes>
-  );
-}
-
-export default App;
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </BrowserRouter>
+  </React.StrictMode>
+);

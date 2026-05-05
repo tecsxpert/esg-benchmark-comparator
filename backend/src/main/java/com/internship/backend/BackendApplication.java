@@ -1,13 +1,10 @@
 package com.internship.backend;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class BackendApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(BackendApplication.class, args);
+/**
+ * Legacy package marker retained so older imports do not break.
+ * The runnable Spring Boot entry point is com.internship.tool.ToolApplication.
+ */
+public final class BackendApplication {
+	private BackendApplication() {
 	}
-
 }
