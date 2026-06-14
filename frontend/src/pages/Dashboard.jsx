@@ -1,114 +1,198 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-function Dashboard() {
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [status, setStatus] = useState("");
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
+function Dashboard({ onLogout }) {
+
   const [data, setData] = useState([]);
+  const [filtered, setFiltered] = useState([]);
+  const [search, setSearch] = useState("");
 
-  // ✅ AI states
-  const [aiInput, setAiInput] = useState("");
-  const [aiResponse, setAiResponse] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
 
-  // ✅ AI function
-  const handleAI = () => {
-    setLoading(true);
+  const navigate = useNavigate();
 
-    setTimeout(() => {
-      setAiResponse("AI Suggestion: Improve ESG score by reducing emissions.");
-      setLoading(false);
-    }, 1500);
+  useEffect(() => {
+
+    axios.get("http://localhost:8080/api/all")
+      .then((res) => {
+        setData(res.data);
+        setFiltered(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+  }, []);
+
+  const handleSearch = (value) => {
+
+    setSearch(value);
+
+    const result = data.filter((item) =>
+      (item.name || item.companyName)
+        .toLowerCase()
+        .includes(value.toLowerCase())
+    );
+
+    setFiltered(result);
   };
 
-  // Debounce typing
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 500);
+  const handleAI = () => {
 
-    return () => clearTimeout(timer);
-  }, [search]);
+    if (!question) {
+      return;
+    }
 
-  // API Call
-  useEffect(() => {
-    axios
-      .get("http://localhost:8080/companies", {
-        params: {
-          search: debouncedSearch,
-          status: status,
-          fromDate: fromDate,
-          toDate: toDate,
-        },
-      })
-      .then((res) => setData(res.data))
-      .catch(() => {
-        setData([
-          { id: 1, name: "Tesla", status: "Active", date: "2026-04-20" },
-          { id: 2, name: "Infosys", status: "Inactive", date: "2026-04-22" },
-        ]);
-      });
-  }, [debouncedSearch, status, fromDate, toDate]);
+    setAnswer(
+      "AI Suggestion: Improve ESG score by focusing on sustainability, governance, and renewable initiatives."
+    );
+  };
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h1>ESG Search Dashboard</h1>
 
-      {/* 🔍 Filters */}
-      <input
-        placeholder="Search company..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+    <div style={{
+      padding: "20px",
+      background: "#f4f6f9",
+      minHeight: "100vh"
+    }}>
 
-      <select onChange={(e) => setStatus(e.target.value)}>
-        <option value="">All Status</option>
-        <option>Active</option>
-        <option>Inactive</option>
-      </select>
+      {/* HEADER */}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center"
+      }}>
 
-      <input type="date" onChange={(e) => setFromDate(e.target.value)} />
-      <input type="date" onChange={(e) => setToDate(e.target.value)} />
+        <h2>ESG Dashboard</h2>
 
-      <hr />
-
-      {/* 📊 Data List */}
-      {data.map((item) => (
-        <div key={item.id}>
-          {item.name} | {item.status} | {item.date}
-        </div>
-      ))}
-
-      {/* 🤖 AI PANEL (NEW) */}
-      <hr />
-
-      <h2>AI Panel</h2>
-
-      <input
-        placeholder="Ask AI..."
-        value={aiInput}
-        onChange={(e) => setAiInput(e.target.value)}
-      />
-
-      <button onClick={handleAI}>Ask AI</button>
-
-      {loading && <p>Loading...</p>}
-
-      {aiResponse && (
-        <div
+        <button
+          onClick={onLogout}
           style={{
-            marginTop: "10px",
-            padding: "15px",
-            border: "1px solid gray",
-            borderRadius: "10px",
+            background: "red",
+            color: "white",
+            border: "none",
+            padding: "10px 15px",
+            borderRadius: "5px",
+            cursor: "pointer"
           }}
         >
-          {aiResponse}
-        </div>
-      )}
+          Logout
+        </button>
+
+      </div>
+
+      {/* SEARCH */}
+      <div style={{ marginTop: "20px" }}>
+
+        <input
+          type="text"
+          placeholder="Search company..."
+          value={search}
+          onChange={(e) => handleSearch(e.target.value)}
+          style={{
+            padding: "10px",
+            width: "300px",
+            borderRadius: "5px",
+            border: "1px solid #ccc"
+          }}
+        />
+
+      </div>
+
+      {/* DATA CARDS */}
+      <div style={{ marginTop: "20px" }}>
+
+        {filtered.map((item) => (
+
+          <div
+            key={item.id}
+            style={{
+              background: "white",
+              padding: "15px",
+              marginBottom: "15px",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+            }}
+          >
+
+            <h3>{item.name || item.companyName}</h3>
+
+            <p>
+              Score: {item.score || item.esgScore}
+            </p>
+
+          </div>
+
+        ))}
+
+      </div>
+
+      {/* AI PANEL */}
+      <div style={{
+        marginTop: "40px",
+        background: "white",
+        padding: "20px",
+        borderRadius: "10px",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+      }}>
+
+        <h3>AI Panel</h3>
+
+        <input
+          type="text"
+          placeholder="Ask AI..."
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          style={{
+            padding: "10px",
+            width: "300px",
+            borderRadius: "5px",
+            border: "1px solid #ccc"
+          }}
+        />
+
+        <button
+          onClick={handleAI}
+          style={{
+            marginLeft: "10px",
+            padding: "10px 15px",
+            background: "green",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer"
+          }}
+        >
+          Ask AI
+        </button>
+
+        <p style={{ marginTop: "15px" }}>
+          {answer}
+        </p>
+
+      </div>
+
+      {/* ANALYTICS BUTTON */}
+      <div style={{ marginTop: "30px" }}>
+
+        <button
+          onClick={() => navigate("/analytics")}
+          style={{
+            padding: "12px 20px",
+            background: "#1976d2",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer"
+          }}
+        >
+          View Analytics
+        </button>
+
+      </div>
+
     </div>
   );
 }

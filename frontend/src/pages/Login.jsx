@@ -1,46 +1,141 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 
-function Login() {
+function Login({ onLogin }) {
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const { login } = useAuth();
-  const navigate = useNavigate();
-
   const handleSubmit = (e) => {
+
     e.preventDefault();
 
-    if (login(username, password)) {
-      navigate("/audit-logs");
+    if (username === "admin" && password === "admin") {
+      onLogin();
     } else {
-      alert("Invalid Login");
+      alert("Invalid Username or Password");
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Login</h2>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder="Username"
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <br /><br />
+    <div style={{
+      height: "100vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      background: "none"
+    }}>
 
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <br /><br />
+      <div style={{
+        width: "380px",
+        background: "white",
+        padding: "40px",
+        borderRadius: "15px",
+        boxShadow: "0 8px 20px rgba(0,0,0,0.2)"
+      }}>
 
-        <button type="submit">Login</button>
-      </form>
+        <div style={{ textAlign: "center" }}>
 
-      <p>Use: admin / 1234</p>
+          <h1 style={{
+            marginBottom: "10px",
+            color: "#0f172a"
+          }}>
+            ESG Platform
+          </h1>
+
+          <p style={{
+            color: "gray",
+            marginBottom: "30px"
+          }}>
+            Login to access dashboard analytics
+          </p>
+
+        </div>
+
+        <form onSubmit={handleSubmit}>
+
+          <div style={{ marginBottom: "20px" }}>
+
+            <label style={{
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "bold"
+            }}>
+              Username
+            </label>
+
+            <input
+              type="text"
+              placeholder="Enter username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "12px",
+                borderRadius: "8px",
+                border: "1px solid #ccc",
+                fontSize: "14px"
+              }}
+            />
+
+          </div>
+
+          <div style={{ marginBottom: "25px" }}>
+
+            <label style={{
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "bold"
+            }}>
+              Password
+            </label>
+
+            <input
+              type="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "12px",
+                borderRadius: "8px",
+                border: "1px solid #ccc",
+                fontSize: "14px"
+              }}
+            />
+
+          </div>
+
+          <button
+            type="submit"
+            style={{
+              width: "100%",
+              padding: "12px",
+              background: "#2563eb",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "16px",
+              fontWeight: "bold",
+              cursor: "pointer"
+            }}
+          >
+            Login
+          </button>
+
+        </form>
+
+        <div style={{
+          marginTop: "20px",
+          textAlign: "center",
+          color: "gray",
+          fontSize: "14px"
+        }}>
+          Demo Credentials: admin / admin
+        </div>
+
+      </div>
+
     </div>
   );
 }
